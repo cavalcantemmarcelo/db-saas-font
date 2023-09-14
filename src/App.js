@@ -1,25 +1,33 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useEffect } from 'react';
+import { connect } from 'react-redux';
+import { connectToSocket, sendMessage } from './actions/websocketActions';
 
-function App() {
+const App = ({ messages, connectToSocket, sendMessage }) => {
+  useEffect(() => {
+    connectToSocket();
+  }, [connectToSocket]);
+
+  const handleSendMessage = () => {
+    const message = 'Hello, WebSocket!';
+    sendMessage(message);
+  };
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <button onClick={handleSendMessage}>Send Message</button>
+      <ul>
+        {messages.map((message, index) => (
+          <li key={index}>{message}</li>
+        ))}
+      </ul>
     </div>
   );
-}
+};
 
-export default App;
+const mapStateToProps = (state) => {
+  return {
+    messages: state.websocket.messages,
+  };
+};
+
+export default connect(mapStateToProps, { connectToSocket, sendMessage })(App);
